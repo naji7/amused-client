@@ -2,12 +2,15 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import type { IProduct } from "../types/product.type";
 import { getProducts } from "../api/product.api";
+import { EVENT_URL } from "../constant/app";
+import type { IAlert } from "../types/alert.type";
+import { toast } from "react-toastify";
 
 export type ProductContextType = {
   products: IProduct[];
-  // lowStockAlerts: IProduct[];
   fetchProducts: () => Promise<void>;
   isProductLoading: boolean;
+  lowStockAlerts: IAlert[];
 };
 
 export const ProductContext = createContext<ProductContextType | undefined>(
@@ -17,14 +20,7 @@ export const ProductContext = createContext<ProductContextType | undefined>(
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [isProductLoading, setIsProductLoading] = useState<boolean>(false);
-  // const [lowStockAlerts, setLowStockAlerts] = useState<IProduct[]>([]);
-
-  // const STOCK_THRESHOLD = 5;
-
-  // useEffect(() => {
-  //   const alerts = products.filter((p) => p.quantity <= STOCK_THRESHOLD);
-  //   setLowStockAlerts(alerts);
-  // }, [products]);
+  const [lowStockAlerts, setLowStockAlerts] = useState<IAlert[]>([]);
 
   const fetchProducts = async () => {
     setIsProductLoading(true);
@@ -43,11 +39,33 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const eventSource = new EventSource(EVENT_URL);
+
+    // eventSource.onmessage = (event) => {
+    //   const alerts = JSON.parse(event.data);
+    //   console.log("alerts : ", alerts);
+    //   setLowStockAlerts(alerts);
+    // };
+
+    eventSource.addEventListener("lowStock", (event) => {
+      const alerts = JSON.parse(event.data);
+      setLowStockAlerts((prev) => [...prev, alerts]);
+    });
+
+    eventSource.onerror = () => {
+      toast.error(`Connection lost!`);
+      eventSource.close();
+    };
+
+    return () => eventSource.close();
+  }, []);
+
   return (
     <ProductContext.Provider
       value={{
         products,
-        // lowStockAlerts,
+        lowStockAlerts,
         fetchProducts,
         isProductLoading,
       }}

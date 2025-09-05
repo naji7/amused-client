@@ -5,7 +5,7 @@ import { BASE_URL } from "../constant/app";
 
 export const createProduct = async (data: ICreateProduct) => {
   try {
-    const res = await axios.post(BASE_URL, data);
+    const res = await axios.post(`${BASE_URL}/products`, data);
     return res.data;
   } catch (error) {
     console.log("error : ", error);
@@ -15,7 +15,7 @@ export const createProduct = async (data: ICreateProduct) => {
 
 export const getProducts = async () => {
   try {
-    const res = await axios.get(BASE_URL);
+    const res = await axios.get(`${BASE_URL}/products`);
     return res.data;
   } catch (error) {
     console.log("error : ", error);
@@ -25,7 +25,7 @@ export const getProducts = async () => {
 
 export const updateProduct = async (id: string, data: IUpdateProduct) => {
   try {
-    const res = await axios.put(`${BASE_URL}/${id}`, data);
+    const res = await axios.put(`${BASE_URL}/products/${id}`, data);
     return res.data;
   } catch (error) {
     console.log("error : ", error);
@@ -35,7 +35,7 @@ export const updateProduct = async (id: string, data: IUpdateProduct) => {
 
 export const deleteProduct = async (id: string) => {
   try {
-    const res = await axios.delete(`${BASE_URL}/${id}`);
+    const res = await axios.delete(`${BASE_URL}/products/${id}`);
     return res;
   } catch (error) {
     console.log("error : ", error);
