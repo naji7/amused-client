@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,9 +43,24 @@ const ProductModal = ({
     },
   });
 
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    product?.imageUrl || null
+  );
+
   useEffect(() => {
-    if (product) reset(product);
-    else
+    if (product) {
+      reset({
+        sellerId: product.sellerId,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        quantity: product.quantity,
+        category: product.category,
+      });
+      setPreviewUrl(product.imageUrl || null);
+      setSelectedImage(null);
+    } else {
       reset({
         sellerId: "seller123",
         name: "",
@@ -54,7 +69,21 @@ const ProductModal = ({
         quantity: 0,
         category: "ELECTRONICS",
       });
+      setPreviewUrl(null);
+      setSelectedImage(null);
+    }
   }, [product, reset]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const submitHandler = (data: ProductFormValues) => {
+    onSubmit({ ...data, image: selectedImage || undefined });
+  };
 
   return (
     <Modal
@@ -67,7 +96,7 @@ const ProductModal = ({
       <h2 className="text-lg font-medium mb-6">
         {product ? "Edit Product" : "Add Product"}
       </h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(submitHandler)} className="space-y-4">
         <div>
           <label className="text-sm text-gray-600 mb-1">Name</label>
           <input
@@ -120,6 +149,27 @@ const ProductModal = ({
             <span className="text-red-500 text-xs mt-1 ">
               {errors.quantity.message}
             </span>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm text-gray-600 mb-1">Image</label>
+          {!product && (
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full p-2 border border-gray-200 rounded text-sm"
+            />
+          )}
+
+          {previewUrl && (
+            <img
+              src={previewUrl}
+              alt="preview"
+              className="mt-2 h-24 w-24 object-cover rounded border"
+            />
           )}
         </div>
 

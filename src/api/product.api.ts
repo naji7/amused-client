@@ -1,11 +1,11 @@
 import axios from "axios";
 
-import type { ICreateProduct, IUpdateProduct } from "../types/product.type";
 import { BASE_URL } from "../constant/app";
+import type { IUpdateProduct } from "../types/product.type";
 
-export const createProduct = async (data: ICreateProduct) => {
+export const createProduct = async (formData: FormData) => {
   try {
-    const res = await axios.post(`${BASE_URL}/products`, data);
+    const res = await axios.post(`${BASE_URL}/products`, formData);
     return res.data;
   } catch (error) {
     console.log("error : ", error);

@@ -39,7 +39,18 @@ const ProductsDashboard = () => {
         await updateProduct(editingProduct.id, data);
         toast.success("Product updated successfully!");
       } else {
-        const res = await createProduct(data);
+        const formData = new FormData();
+        formData.append("sellerId", data.sellerId);
+        formData.append("name", data.name);
+        formData.append("description", data.description);
+        formData.append("price", data.price.toString());
+        formData.append("quantity", data.quantity.toString());
+        formData.append("category", data.category);
+
+        if (data.image) {
+          formData.append("image", data.image);
+        }
+        const res = await createProduct(formData);
         if (res) {
           await fetchProducts();
           toast.success("Product created successfully!");
@@ -92,6 +103,21 @@ const ProductsDashboard = () => {
           {c.category}
         </span>
       ),
+    },
+    {
+      key: "imageUrl",
+      header: "Image",
+      render: (p) =>
+        p.imageUrl ? (
+          <img
+            src={p.imageUrl}
+            alt={p.name}
+            className="h-12 w-12 object-cover rounded"
+            style={{ display: "block" }}
+          />
+        ) : (
+          <span className="text-gray-400 text-xs">No Image</span>
+        ),
     },
     {
       key: undefined,

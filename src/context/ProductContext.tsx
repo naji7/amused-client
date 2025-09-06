@@ -42,19 +42,15 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const eventSource = new EventSource(EVENT_URL);
 
-    // eventSource.onmessage = (event) => {
-    //   const alerts = JSON.parse(event.data);
-    //   console.log("alerts : ", alerts);
-    //   setLowStockAlerts(alerts);
-    // };
-
     eventSource.addEventListener("lowStock", (event) => {
       const alerts = JSON.parse(event.data);
+      console.log("Low stock alert:", alerts);
       setLowStockAlerts((prev) => [...prev, alerts]);
     });
 
-    eventSource.onerror = () => {
-      toast.error(`Connection lost!`);
+    eventSource.onerror = (err) => {
+      console.log("eerr : ", err);
+      toast.error("Connection lost!");
       eventSource.close();
     };
 

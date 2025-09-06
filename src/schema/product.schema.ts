@@ -7,6 +7,17 @@ export const productSchema = z.object({
   price: z.number().min(0.01, "Price must be greater than 0"),
   quantity: z.number().min(0, "Quantity cannot be negative"),
   category: z.enum(["ELECTRONICS", "FASHION", "HOME", "BOOKS", "TOYS"]),
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine(
+      (file) => !file || ["image/jpeg", "image/png"].includes(file.type),
+      "Only JPEG or PNG images are allowed"
+    )
+    .refine(
+      (file) => !file || file.size <= 5_000_000,
+      "Image must be smaller than 5MB"
+    ),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;

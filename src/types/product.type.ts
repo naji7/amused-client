@@ -10,6 +10,7 @@ export interface IProduct {
   category: Category;
   createdAt: string;
   updatedAt: string;
+  imageUrl: string;
 }
 
 export interface ICreateProduct {
@@ -19,6 +20,7 @@ export interface ICreateProduct {
   price: number;
   quantity: number;
   category: Category;
+  imageUrl: string;
 }
 
 export interface IUpdateProduct {
